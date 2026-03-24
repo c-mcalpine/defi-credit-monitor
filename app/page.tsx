@@ -3,15 +3,26 @@
 import useSWR from "swr";
 import type { LendingPool } from "@/lib/defillama";
 import type { MarketSignals } from "@/lib/signals";
+import type { LiquidationRow, BorrowVolumeRow, StableFlowRow } from "@/lib/dune";
 import SignalBanner from "@/components/SignalBanner";
 import MetricCards from "@/components/MetricCards";
 import LendingTable from "@/components/LendingTable";
 import TvlChart from "@/components/TvlChart";
 import UtilizationChart from "@/components/UtilizationChart";
+import LiquidationChart from "@/components/LiquidationChart";
+import BorrowVolumeChart from "@/components/BorrowVolumeChart";
+import StableFlowChart from "@/components/StableFlowChart";
 
 interface DefiResponse {
   pools: LendingPool[];
   signals: MarketSignals;
+  fetchedAt: string;
+}
+
+interface DuneResponse {
+  liquidations: LiquidationRow[];
+  borrowVolume: BorrowVolumeRow[];
+  stableFlows: StableFlowRow[];
   fetchedAt: string;
 }
 
@@ -42,6 +53,11 @@ export default function Home() {
     "/api/defi",
     fetcher,
     { refreshInterval: 60_000 },
+  );
+  const { data: duneData, isLoading: duneLoading } = useSWR<DuneResponse>(
+    "/api/dune",
+    fetcher,
+    { refreshInterval: 3_600_000 },
   );
 
   if (isLoading || !data) return <Skeleton />;
@@ -106,6 +122,60 @@ export default function Home() {
 
         {/* Utilization Chart */}
         <UtilizationChart pools={pools} />
+
+        {/* Historical Dune Section */}
+        <div className="border-t border-zinc-800 pt-6">
+          <h2 className="text-lg font-semibold tracking-tight text-zinc-50">
+            Historical trends — last 90 days
+          </h2>
+
+          {duneLoading ? (
+            <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[320px] animate-pulse rounded-lg bg-zinc-800/40"
+                />
+              ))}
+            </div>
+          ) : !duneData ? (
+            <p className="mt-4 text-sm text-zinc-500">
+              Historical data unavailable
+            </p>
+          ) : (
+            <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
+                <h3 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+                  Daily liquidations
+                </h3>
+                <p className="mb-4 text-xs text-zinc-600">
+                  Stress indicator — spikes = margin cascade events
+                </p>
+                <LiquidationChart data={duneData.liquidations} />
+              </div>
+
+              <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
+                <h3 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+                  USDC borrow volume
+                </h3>
+                <p className="mb-4 text-xs text-zinc-600">
+                  Credit demand — rising volume = leverage expansion
+                </p>
+                <BorrowVolumeChart data={duneData.borrowVolume} />
+              </div>
+
+              <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
+                <h3 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+                  Stablecoin net flows
+                </h3>
+                <p className="mb-4 text-xs text-zinc-600">
+                  Capital positioning — negative = risk-off rotation out of Aave
+                </p>
+                <StableFlowChart data={duneData.stableFlows} />
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Footer */}
         <footer className="border-t border-zinc-800 pt-4 text-center text-xs text-zinc-600">

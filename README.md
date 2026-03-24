@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DeFi Credit Market Monitor
 
-## Getting Started
+A macro analysis dashboard for decentralized lending markets. It combines live lending pool data from DeFiLlama with 90-day historical on-chain event data from Dune Analytics to surface the same credit conditions — rates, utilization, leverage, and capital flows — that fixed-income analysts track in traditional markets, applied to DeFi.
 
-First, run the development server:
+**Live demo:** [add your Vercel URL here]
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Architecture
+
+The monitor uses a two-layer data approach. DeFiLlama provides a real-time snapshot of lending pool metrics across major protocols, refreshed every 60 seconds via SWR. Dune Analytics supplies historical on-chain event data decoded from Aave V3 Ethereum contracts, cached at the CDN layer and refreshed hourly.
+
+## Signals and methodology
+
+### Live signals
+
+| Signal | Metric | TradFi analog |
+|--------|--------|---------------|
+| **Stablecoin borrow rate** | TVL-weighted average borrow APY across USDC/USDT/DAI pools | Fed funds rate / money market rate — the cost of borrowing the ecosystem's base currency |
+| **Utilization rate** | TVL-weighted ratio of borrowed assets to total deposits | Loan-to-deposit ratio — measures how aggressively the system is lending against its capital base |
+| **Total value locked** | Aggregate USD deposits across tracked lending pools | Bank deposits / AUM — total capital allocated to DeFi lending as an asset class |
+
+### Historical charts
+
+| Chart | Metric | TradFi analog |
+|-------|--------|---------------|
+| **Daily liquidations** | Count of liquidation events and unique users liquidated per day | Margin call activity — spikes indicate cascading forced selling and systemic stress |
+| **USDC borrow volume** | Daily USDC borrowing volume and transaction count | Commercial paper issuance / credit demand — rising volume signals leverage expansion |
+| **Stablecoin net flows** | Daily net inflows minus outflows of USDC, USDT, and DAI | Money market fund flows — negative flows signal risk-off positioning and capital rotation out of lending |
+
+## Data sources
+
+- **DeFiLlama** — [Yields API](https://defillama.com/docs/api) for real-time lending pool data (TVL, borrow rates, utilization) across Aave, Compound, Spark, Morpho, and others
+- **Dune Analytics** — Aave V3 Ethereum decoded contracts for historical liquidation events, borrow transactions, and stablecoin reserve flows
+
+## Local development
+
+Create a `.env.local` file with the following variables:
+
+```
+DUNE_API_KEY=your_dune_api_key
+DUNE_LIQUIDATIONS_ID=your_liquidations_query_id
+DUNE_BORROW_VOLUME_ID=your_borrow_volume_query_id
+DUNE_STABLE_FLOWS_ID=your_stable_flows_query_id
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then install dependencies and start the dev server:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
