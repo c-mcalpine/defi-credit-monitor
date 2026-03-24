@@ -51,9 +51,10 @@ export default function BorrowVolumeChart({ data }: BorrowVolumeChartProps) {
           }}
           labelStyle={{ color: "#e4e4e7" }}
           labelFormatter={formatDay}
-          formatter={(value: number, name: string) => {
-            if (name === "usdc_borrowed") return [formatUsd(value), "USDC Borrowed"];
-            return [value.toLocaleString(), "Borrow Count"];
+          formatter={(value: any, name: any) => {
+            const v = Number(value);
+            if (name === "usdc_borrowed") return [formatUsd(v), "USDC Borrowed"];
+            return [v.toLocaleString(), "Borrow Count"];
           }}
         />
         <Bar

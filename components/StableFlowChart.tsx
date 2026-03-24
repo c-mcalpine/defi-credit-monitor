@@ -69,7 +69,7 @@ export default function StableFlowChart({ data }: StableFlowChartProps) {
           }}
           labelStyle={{ color: "#e4e4e7" }}
           labelFormatter={formatDay}
-          formatter={(value: number) => [formatUsd(value), "Net Flow"]}
+          formatter={(value: any) => [formatUsd(Number(value)), "Net Flow"]}
         />
         <ReferenceLine y={0} stroke="#3f3f46" />
         <Bar dataKey="net_flow" radius={[4, 4, 0, 0]}>
