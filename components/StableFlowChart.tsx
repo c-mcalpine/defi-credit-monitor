@@ -22,8 +22,8 @@ interface AggregatedRow {
   net_flow: number;
 }
 
-function formatDay(day: string): string {
-  const d = new Date(day);
+function formatDay(day: any): string {
+  const d = new Date(String(day));
   return d.toLocaleDateString("en-US", { month: "short", day: "2-digit" });
 }
 
