@@ -12,45 +12,34 @@ const CONFIG: Record<
   {
     label: string;
     description: string;
-    tradFiAnalog: string;
-    bg: string;
-    border: string;
-    text: string;
-    badge: string;
+    borderColor: string;
+    dotColor: string;
+    labelColor: string;
   }
 > = {
   "risk-on": {
     label: "Risk-On",
     description:
-      "Borrowing demand is elevated — leverage is expanding and capital is being deployed aggressively.",
-    tradFiAnalog:
-      "Similar to tightening credit spreads and rising margin debt in traditional markets.",
-    bg: "bg-red-950/40",
-    border: "border-red-500/50",
-    text: "text-red-100",
-    badge: "bg-red-500/20 text-red-400 ring-red-500/30",
+      "Elevated borrowing demand — leverage expanding, capital deployed aggressively",
+    borderColor: "border-l-[var(--accent-red)]",
+    dotColor: "bg-[var(--accent-red)]",
+    labelColor: "text-[var(--accent-red)]",
   },
   neutral: {
     label: "Neutral",
     description:
-      "Borrowing rates and utilization are within normal ranges — no strong directional signal.",
-    tradFiAnalog:
-      "Comparable to stable interbank lending rates and moderate credit activity.",
-    bg: "bg-yellow-950/40",
-    border: "border-yellow-500/50",
-    text: "text-yellow-100",
-    badge: "bg-yellow-500/20 text-yellow-400 ring-yellow-500/30",
+      "Rates and utilization within normal ranges — no strong directional signal",
+    borderColor: "border-l-[var(--accent-amber)]",
+    dotColor: "bg-[var(--accent-amber)]",
+    labelColor: "text-[var(--accent-amber)]",
   },
   "risk-off": {
     label: "Risk-Off",
     description:
-      "Borrowing demand is low and capital is sitting idle — the market is in a defensive posture.",
-    tradFiAnalog:
-      "Analogous to a flight-to-quality environment with widening spreads and low loan demand.",
-    bg: "bg-green-950/40",
-    border: "border-green-500/50",
-    text: "text-green-100",
-    badge: "bg-green-500/20 text-green-400 ring-green-500/30",
+      "Low borrowing demand, idle capital — market in defensive posture",
+    borderColor: "border-l-[var(--accent-green)]",
+    dotColor: "bg-[var(--accent-green)]",
+    labelColor: "text-[var(--accent-green)]",
   },
 };
 
@@ -64,39 +53,39 @@ export default function SignalBanner({
 
   return (
     <div
-      className={`rounded-lg border ${c.border} ${c.bg} ${c.text} px-5 py-4`}
+      className={`flex items-center justify-between rounded-md border border-[var(--border)] ${c.borderColor} border-l-4 bg-[var(--bg-card)] px-4 py-2.5`}
     >
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0 flex-1 space-y-1">
-          <div className="flex items-center gap-2">
-            <span
-              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${c.badge}`}
-            >
-              {c.label}
-            </span>
-            <span className="text-xs opacity-60">{poolCount} pools</span>
-          </div>
-          <p className="text-sm leading-snug">{c.description}</p>
-          <p className="text-xs italic opacity-70">{c.tradFiAnalog}</p>
-        </div>
+      {/* Left: dot + signal label + description */}
+      <div className="flex items-center gap-3 min-w-0">
+        <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${c.dotColor}${marketSignal === "risk-on" ? " animate-risk-pulse" : ""}`} />
+        <span className={`text-sm font-semibold ${c.labelColor}`}>
+          {c.label}
+        </span>
+        <span className="hidden text-xs text-zinc-400 sm:inline">
+          {c.description}
+        </span>
+        <span className="text-xs text-zinc-600 font-mono tabular-nums">
+          {poolCount} pools
+        </span>
+      </div>
 
-        <div className="flex shrink-0 gap-6 sm:text-right">
-          <div>
-            <p className="text-xs uppercase tracking-wide opacity-60">
-              Stable Borrow
-            </p>
-            <p className="text-lg font-semibold">
-              {weightedStableBorrowRate.toFixed(2)}%
-            </p>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-wide opacity-60">
-              Utilization
-            </p>
-            <p className="text-lg font-semibold">
-              {weightedUtilization.toFixed(1)}%
-            </p>
-          </div>
+      {/* Right: two key metrics inline */}
+      <div className="flex shrink-0 items-center gap-5">
+        <div className="text-right">
+          <p className="text-[11px] uppercase tracking-wide text-zinc-500">
+            Stable Borrow
+          </p>
+          <p className="text-sm font-semibold font-mono tabular-nums text-zinc-100">
+            {weightedStableBorrowRate.toFixed(2)}%
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-[11px] uppercase tracking-wide text-zinc-500">
+            Utilization
+          </p>
+          <p className="text-sm font-semibold font-mono tabular-nums text-zinc-100">
+            {weightedUtilization.toFixed(1)}%
+          </p>
         </div>
       </div>
     </div>

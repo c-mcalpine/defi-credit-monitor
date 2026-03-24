@@ -2,7 +2,7 @@
 
 A macro analysis dashboard for decentralized lending markets. It combines live lending pool data from DeFiLlama with 90-day historical on-chain event data from Dune Analytics to surface the same credit conditions — rates, utilization, leverage, and capital flows — that fixed-income analysts track in traditional markets, applied to DeFi.
 
-**Live demo:** [add your Vercel URL here]
+**Live demo:** https://defi-credit-monitor-sigma.vercel.app/
 
 ## Architecture
 

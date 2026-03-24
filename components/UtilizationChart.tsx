@@ -7,10 +7,12 @@ import {
   XAxis,
   YAxis,
   Tooltip,
+  CartesianGrid,
   ResponsiveContainer,
   Cell,
 } from "recharts";
 import type { LendingPool } from "@/lib/defillama";
+import { COLORS, TOOLTIP_STYLE, AXIS_TICK_STYLE, AXIS_LABEL_STYLE, CARTESIAN_GRID_STYLE, BAR_CURSOR } from "@/lib/constants";
 
 interface UtilizationChartProps {
   pools: LendingPool[];
@@ -24,9 +26,9 @@ interface ChartRow {
 }
 
 function barColor(rate: number): string {
-  if (rate > 85) return "#ef4444";
-  if (rate >= 70) return "#f59e0b";
-  return "#3b82f6";
+  if (rate > 85) return COLORS.utilHigh;
+  if (rate >= 70) return COLORS.utilMedium;
+  return COLORS.utilLow;
 }
 
 export default function UtilizationChart({ pools }: UtilizationChartProps) {
@@ -43,7 +45,7 @@ export default function UtilizationChart({ pools }: UtilizationChartProps) {
   }, [pools]);
 
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
+    <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-card)] p-5">
       <h3 className="mb-4 text-sm font-medium uppercase tracking-wide text-zinc-500">
         Top 10 Pools by Utilization
       </h3>
@@ -53,11 +55,12 @@ export default function UtilizationChart({ pools }: UtilizationChartProps) {
           layout="vertical"
           margin={{ top: 0, right: 40, bottom: 0, left: 0 }}
         >
+          <CartesianGrid {...CARTESIAN_GRID_STYLE} horizontal={true} vertical={false} />
           <XAxis
             type="number"
             domain={[0, 100]}
             tickFormatter={(v: number) => `${v}%`}
-            tick={{ fill: "#71717a", fontSize: 12 }}
+            tick={AXIS_TICK_STYLE}
             axisLine={false}
             tickLine={false}
           />
@@ -65,18 +68,13 @@ export default function UtilizationChart({ pools }: UtilizationChartProps) {
             type="category"
             dataKey="name"
             width={180}
-            tick={{ fill: "#a1a1aa", fontSize: 12 }}
+            tick={AXIS_LABEL_STYLE}
             axisLine={false}
             tickLine={false}
           />
           <Tooltip
-            contentStyle={{
-              backgroundColor: "#18181b",
-              border: "1px solid #3f3f46",
-              borderRadius: 8,
-              fontSize: 13,
-            }}
-            labelStyle={{ color: "#e4e4e7" }}
+            {...TOOLTIP_STYLE}
+            cursor={BAR_CURSOR}
             formatter={(value: string | number | readonly (string | number)[] | undefined) => [`${value ?? ""}%`, "Utilization"]}
           />
           <Bar dataKey="utilRate" radius={[0, 4, 4, 0]} barSize={20}>

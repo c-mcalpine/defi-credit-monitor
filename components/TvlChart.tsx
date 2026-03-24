@@ -7,9 +7,11 @@ import {
   XAxis,
   YAxis,
   Tooltip,
+  CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
 import type { LendingPool } from "@/lib/defillama";
+import { formatTvl, COLORS, TOOLTIP_STYLE, AXIS_TICK_STYLE, AXIS_LABEL_STYLE, CARTESIAN_GRID_STYLE, BAR_CURSOR } from "@/lib/constants";
 
 interface TvlChartProps {
   pools: LendingPool[];
@@ -19,14 +21,6 @@ interface ChartRow {
   project: string;
   tvl: number;
 }
-
-function formatTvl(value: number): string {
-  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(0)}M`;
-  return `$${(value / 1_000).toFixed(0)}K`;
-}
-
-const BAR_COLOR = "#6366f1";
 
 export default function TvlChart({ pools }: TvlChartProps) {
   const data: ChartRow[] = useMemo(() => {
@@ -41,7 +35,7 @@ export default function TvlChart({ pools }: TvlChartProps) {
   }, [pools]);
 
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
+    <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-card)] p-5">
       <h3 className="mb-4 text-sm font-medium uppercase tracking-wide text-zinc-500">
         TVL by Protocol
       </h3>
@@ -51,10 +45,11 @@ export default function TvlChart({ pools }: TvlChartProps) {
           layout="vertical"
           margin={{ top: 0, right: 40, bottom: 0, left: 0 }}
         >
+          <CartesianGrid {...CARTESIAN_GRID_STYLE} horizontal={true} vertical={false} />
           <XAxis
             type="number"
             tickFormatter={formatTvl}
-            tick={{ fill: "#71717a", fontSize: 12 }}
+            tick={AXIS_TICK_STYLE}
             axisLine={false}
             tickLine={false}
           />
@@ -62,23 +57,18 @@ export default function TvlChart({ pools }: TvlChartProps) {
             type="category"
             dataKey="project"
             width={120}
-            tick={{ fill: "#a1a1aa", fontSize: 12 }}
+            tick={AXIS_LABEL_STYLE}
             axisLine={false}
             tickLine={false}
           />
           <Tooltip
-            contentStyle={{
-              backgroundColor: "#18181b",
-              border: "1px solid #3f3f46",
-              borderRadius: 8,
-              fontSize: 13,
-            }}
-            labelStyle={{ color: "#e4e4e7" }}
+            {...TOOLTIP_STYLE}
+            cursor={BAR_CURSOR}
             formatter={(value: string | number | readonly (string | number)[] | undefined) => [typeof value === "number" ? formatTvl(value) : String(value ?? ""), "TVL"]}
           />
           <Bar
             dataKey="tvl"
-            fill={BAR_COLOR}
+            fill={COLORS.chartTvlBar}
             radius={[0, 4, 4, 0]}
             barSize={24}
           />

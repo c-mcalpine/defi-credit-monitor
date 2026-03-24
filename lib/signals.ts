@@ -1,4 +1,5 @@
 import type { LendingPool } from "./defillama";
+import { STABLECOINS } from "./constants";
 
 export type MarketSignal = "risk-on" | "neutral" | "risk-off";
 
@@ -8,8 +9,6 @@ export interface MarketSignals {
   totalTvl: number;
   marketSignal: MarketSignal;
 }
-
-const STABLECOINS = new Set(["USDC", "USDT", "DAI"]);
 
 function isStablecoin(symbol: string): boolean {
   return STABLECOINS.has(symbol);

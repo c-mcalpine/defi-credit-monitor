@@ -6,50 +6,37 @@ import {
   XAxis,
   YAxis,
   Tooltip,
+  CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
 import type { BorrowVolumeRow } from "@/lib/dune";
+import { formatDay, formatUsd, COLORS, TOOLTIP_STYLE, AXIS_TICK_STYLE, CARTESIAN_GRID_STYLE, BAR_CURSOR } from "@/lib/constants";
 
 interface BorrowVolumeChartProps {
   data: BorrowVolumeRow[];
-}
-
-function formatDay(day: any): string {
-  const d = new Date(String(day));
-  return d.toLocaleDateString("en-US", { month: "short", day: "2-digit" });
-}
-
-function formatUsd(value: number): string {
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `$${(value / 1_000).toFixed(0)}K`;
-  return `$${value.toFixed(0)}`;
 }
 
 export default function BorrowVolumeChart({ data }: BorrowVolumeChartProps) {
   return (
     <ResponsiveContainer width="100%" height={240}>
       <BarChart data={data} margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
+        <CartesianGrid {...CARTESIAN_GRID_STYLE} />
         <XAxis
           dataKey="day"
           tickFormatter={formatDay}
-          tick={{ fill: "#71717a", fontSize: 12 }}
+          tick={AXIS_TICK_STYLE}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
           tickFormatter={formatUsd}
-          tick={{ fill: "#71717a", fontSize: 12 }}
+          tick={AXIS_TICK_STYLE}
           axisLine={false}
           tickLine={false}
         />
         <Tooltip
-          contentStyle={{
-            backgroundColor: "#18181b",
-            border: "1px solid #3f3f46",
-            borderRadius: 8,
-            fontSize: 13,
-          }}
-          labelStyle={{ color: "#e4e4e7" }}
+          {...TOOLTIP_STYLE}
+          cursor={BAR_CURSOR}
           labelFormatter={formatDay}
           formatter={(value: any, name: any) => {
             const v = Number(value);
@@ -59,7 +46,7 @@ export default function BorrowVolumeChart({ data }: BorrowVolumeChartProps) {
         />
         <Bar
           dataKey="usdc_borrowed"
-          fill="#378ADD"
+          fill={COLORS.chartBorrowVolume}
           radius={[4, 4, 0, 0]}
         />
       </BarChart>

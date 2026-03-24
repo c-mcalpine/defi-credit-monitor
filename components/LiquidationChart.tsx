@@ -7,43 +7,35 @@ import {
   YAxis,
   Tooltip,
   Legend,
+  CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
 import type { LiquidationRow } from "@/lib/dune";
+import { formatDay, COLORS, TOOLTIP_STYLE, AXIS_TICK_STYLE, CARTESIAN_GRID_STYLE } from "@/lib/constants";
 
 interface LiquidationChartProps {
   data: LiquidationRow[];
-}
-
-function formatDay(day: any): string {
-  const d = new Date(String(day));
-  return d.toLocaleDateString("en-US", { month: "short", day: "2-digit" });
 }
 
 export default function LiquidationChart({ data }: LiquidationChartProps) {
   return (
     <ResponsiveContainer width="100%" height={240}>
       <LineChart data={data} margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
+        <CartesianGrid {...CARTESIAN_GRID_STYLE} />
         <XAxis
           dataKey="day"
           tickFormatter={formatDay}
-          tick={{ fill: "#71717a", fontSize: 12 }}
+          tick={AXIS_TICK_STYLE}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: "#71717a", fontSize: 12 }}
+          tick={AXIS_TICK_STYLE}
           axisLine={false}
           tickLine={false}
         />
         <Tooltip
-          contentStyle={{
-            backgroundColor: "#18181b",
-            border: "1px solid #3f3f46",
-            borderRadius: 8,
-            fontSize: 13,
-          }}
-          labelStyle={{ color: "#e4e4e7" }}
+          {...TOOLTIP_STYLE}
           labelFormatter={formatDay}
         />
         <Legend />
@@ -51,7 +43,7 @@ export default function LiquidationChart({ data }: LiquidationChartProps) {
           type="monotone"
           dataKey="liquidation_count"
           name="Liquidations"
-          stroke="#E24B4A"
+          stroke={COLORS.chartLiquidations}
           strokeWidth={2}
           dot={false}
         />
@@ -59,7 +51,7 @@ export default function LiquidationChart({ data }: LiquidationChartProps) {
           type="monotone"
           dataKey="unique_users_liquidated"
           name="Unique Users"
-          stroke="#EF9F27"
+          stroke={COLORS.chartUniqueUsers}
           strokeWidth={2}
           dot={false}
         />
